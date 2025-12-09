@@ -1,0 +1,110 @@
+/* 全局重置与背景 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #80deea);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+/* 主容器 */
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    width: 380px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 25px;
+    color: #0277bd;
+}
+
+/* 水杯主体 */
+.water-cup {
+    width: 200px;
+    height: 260px;
+    margin: 30px auto;
+    background: #bbdefb;
+    border-radius: 0 0 100px 100px;
+    position: relative;
+    overflow: hidden;
+    border: 6px solid #81d4fa;
+}
+
+/* 水体（随饮水量上升） */
+.water {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;                     /* 初始为0，JS动态修改 */
+    background: #29b6f6;
+    transition: height 0.9s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* 波浪动画（两层叠加更自然） */
+.wave {
+    position: absolute;
+    top: -60px;
+    width: 300px;
+    height: 100px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 45%;
+    animation: wave 4s linear infinite;
+}
+
+@keyframes wave {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-150px); }
+}
+
+/* 按钮样式 */
+.buttons button {
+    margin: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    background: #29b6f6;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.buttons button:hover {
+    background: #0288d1;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+/* 统计区 */
+.stats {
+    margin-top: 25px;
+    font-size: 18px;
+    line-height: 2;
+}
+
+.streak {
+    margin-top: 10px;
+    font-size: 20px;
+    color: #e91e63;
+}

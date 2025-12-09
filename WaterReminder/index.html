@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>饮水记录与健康提醒</title>
+    
+    <!-- 引入外部 CSS 文件 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>饮水记录小助手</h1>
+
+        <!-- 水杯动画区域 -->
+        <div class="water-cup" id="cup">
+            <div class="water" id="water">
+                <span id="amount-text">0ml</span>
+            </div>
+            <!-- 两层波浪实现流动效果 -->
+            <div class="wave"></div>
+            <div class="wave" style="animation-delay: -2s;"></div>
+        </div>
+
+        <!-- 加水按钮区 -->
+        <div class="buttons">
+            <button onclick="addWater(150)">+150ml 小杯</button>
+            <button onclick="addWater(250)">+250ml 普通杯</button>
+            <button onclick="addWater(500)">+500ml 大瓶</button>
+            <button onclick="customAdd()">自定义</button>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats">
+            今日目标：<span id="goal">2000</span> ml　|　
+            已饮：<span id="today">0</span> ml　|　
+            完成 <span id="percent">0</span>%
+            <div class="streak" id="streak">连续打卡 0 天</div>
+        </div>
+    </div>
+
+    <!-- 引入外部 JS 文件（放在最后保证 DOM 已加载） -->
+    <script src="js/script.js"></script>
+</body>
+</html>
