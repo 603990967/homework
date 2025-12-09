@@ -9,47 +9,74 @@
 </head>
 <body>
     <div class="container">
+        <!-- 顶部标题与设置 -->
         <header>
-            <h1>饮水记录小助手</h1>
+            <h1>饮水记录与健康提醒</h1>
             <button id="settings-btn" title="设置">Settings</button>
         </header>
 
-        <!-- 水杯区域 -->
-        <div class="water-cup" id="cup">
-            <div class="water" id="water">
-                <div class="amount-text" id="amount-text">0 ml</div>
+        <!-- 水杯动画 -->
+        <div class="water-section">
+            <div class="water-cup" id="cup">
+                <div class="water" id="water">
+                    <div class="amount-text" id="amount-text">0 ml</div>
+                </div>
+                <div class="wave"></div>
+                <div class="wave" style="animation-delay: -2s; opacity: 0.6;"></div>
             </div>
-            <div class="wave"></div>
-            <div class="wave" style="animation-delay: -2s; opacity: 0.6;"></div>
+            <div class="progress-text">
+                今日进度 <span id="percent">0</span>% · 已饮 <span id="today">0</span> ml
+            </div>
         </div>
 
-        <!-- 统计信息 -->
-        <div class="stats">
-            <div>今日已饮 <span id="today">0</span> ml</div>
-            <div class="progress-text">目标 <span id="goal">2000</span> ml · 完成 <span id="percent">0</span>%</div>
-            <div class="streak" id="streak">连续打卡 0 天</div>
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">今日目标</div>
+                <div class="value" id="goal">2000</div>
+                <div class="unit">ml</div>
+            </div>
+            <div class="stat-card highlight">
+                <div class="label">连续打卡</div>
+                <div class="value" id="streak">0</div>
+                <div class="unit">天</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">本周平均</div>
+                <div class="value" id="week-avg">0</div>
+                <div class="unit">ml</div>
+            </div>
         </div>
 
-        <!-- 加水按钮 -->
+        <!-- 加水按钮区 -->
         <div class="buttons">
-            <button onclick="addWater(150)">+150ml<br><small>小杯</small></button>
+            <button onclick="addWater(150)">+150ml<br><small>小杯茶</small></button>
             <button onclick="addWater(250)">+250ml<br><small>标准杯</small></button>
-            <button onclick="addWater(500)">+500ml<br><small>大瓶</small></button>
-            <button onclick="customAdd()" class="custom">自定义</button>
+            <button onclick="addWater(500)">+500ml<br><small>大瓶水</small></button>
+            <button onclick="customAdd()" class="custom-btn">自定义</button>
         </div>
 
-        <!-- 功能按钮区 -->
+        <!-- 健康提醒区域（新功能） -->
+        <div class="reminder-section">
+            <h3>健康喝水小贴士</h3>
+            <div class="tip-card" id="tip-card">
+                点击按钮获取今日健康提醒
+            </div>
+            <button onclick="getRandomTip()" class="tip-btn">换一条提醒</button>
+        </div>
+
+        <!-- 功能按钮 -->
         <div class="actions">
-            <button onclick="showHistory()" class="secondary">查看历史记录</button>
+            <button onclick="showHistory()" class="secondary">查看7天记录</button>
             <button id="reset-btn" class="danger">长按重置当天</button>
         </div>
     </div>
 
-    <!-- 设置弹窗（隐藏） -->
+    <!-- 设置弹窗 -->
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h3>设置每日目标（ml）</h3>
-            <input type="number" id="new-goal" value="2000" min="1000" max="5000" step="100">
+            <h3>每日喝水目标（ml）</h3>
+            <input type="number" id="new-goal" min="1000" max="5000" step="100" value="2000">
             <div class="modal-buttons">
                 <button onclick="saveGoal()">保存</button>
                 <button onclick="closeModal()">取消</button>
