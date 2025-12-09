@@ -4,42 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>饮水记录与健康提醒</title>
-    
-    <!-- 引入外部 CSS 文件 -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>Water</text></svg>">
 </head>
 <body>
     <div class="container">
-        <h1>饮水记录小助手</h1>
+        <header>
+            <h1>饮水记录小助手</h1>
+            <button id="settings-btn" title="设置">Settings</button>
+        </header>
 
-        <!-- 水杯动画区域 -->
+        <!-- 水杯区域 -->
         <div class="water-cup" id="cup">
             <div class="water" id="water">
-                <span id="amount-text">0ml</span>
+                <div class="amount-text" id="amount-text">0 ml</div>
             </div>
-            <!-- 两层波浪实现流动效果 -->
             <div class="wave"></div>
-            <div class="wave" style="animation-delay: -2s;"></div>
-        </div>
-
-        <!-- 加水按钮区 -->
-        <div class="buttons">
-            <button onclick="addWater(150)">+150ml 小杯</button>
-            <button onclick="addWater(250)">+250ml 普通杯</button>
-            <button onclick="addWater(500)">+500ml 大瓶</button>
-            <button onclick="customAdd()">自定义</button>
+            <div class="wave" style="animation-delay: -2s; opacity: 0.6;"></div>
         </div>
 
         <!-- 统计信息 -->
         <div class="stats">
-            今日目标：<span id="goal">2000</span> ml　|　
-            已饮：<span id="today">0</span> ml　|　
-            完成 <span id="percent">0</span>%
+            <div>今日已饮 <span id="today">0</span> ml</div>
+            <div class="progress-text">目标 <span id="goal">2000</span> ml · 完成 <span id="percent">0</span>%</div>
             <div class="streak" id="streak">连续打卡 0 天</div>
+        </div>
+
+        <!-- 加水按钮 -->
+        <div class="buttons">
+            <button onclick="addWater(150)">+150ml<br><small>小杯</small></button>
+            <button onclick="addWater(250)">+250ml<br><small>标准杯</small></button>
+            <button onclick="addWater(500)">+500ml<br><small>大瓶</small></button>
+            <button onclick="customAdd()" class="custom">自定义</button>
+        </div>
+
+        <!-- 功能按钮区 -->
+        <div class="actions">
+            <button onclick="showHistory()" class="secondary">查看历史记录</button>
+            <button id="reset-btn" class="danger">长按重置当天</button>
         </div>
     </div>
 
-    <!-- 引入外部 JS 文件（放在最后保证 DOM 已加载） -->
+    <!-- 设置弹窗（隐藏） -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h3>设置每日目标（ml）</h3>
+            <input type="number" id="new-goal" value="2000" min="1000" max="5000" step="100">
+            <div class="modal-buttons">
+                <button onclick="saveGoal()">保存</button>
+                <button onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
 </body>
 </html>

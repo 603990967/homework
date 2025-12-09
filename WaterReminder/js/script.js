@@ -1,44 +1,46 @@
-// ==================== 配置区 ====================
-const STORAGE_KEY = "waterReminderData2025"; // localStorage 键名，改年份防冲突
-const DAILY_GOAL = 2000;                     // 每日目标（ml），可自行修改
-const MIN_FOR_STREAK = 1000;                 // 算打卡的最低饮水量
-const REMIND_INTERVAL = 45 * 60 * 1000;      // 提醒间隔：45分钟
+// ==================== 配置 ====================
+const STORAGE_KEY = "waterReminderPro2025";
+let DAILY_GOAL = 2000;
+const MIN_FOR_STREAK = 1000;
+const REMIND_INTERVAL = 45 * 60 * 1000;
 
-// ==================== 数据结构 ====================
-let data = {
-    records: {},   // 例: {"2025-12-09": 1750, "2025-12-08": 2100}
-    lastRemind: 0  // 记录上次提醒时间戳，防止重复弹窗
-};
+// ==================== 数据 ====================
+let data = { records: {}, lastRemind: 0 };
 
 // ==================== 初始化 ====================
-// 页面加载完载全后执行
-window.onload = function () {
+window.onload = () => {
     loadData();
+    loadGoal();
     updateUI();
     updateStreak();
-    startRemindTimer(); // 启动定时提醒
+    startRemindTimer();
+    setupResetButton();
+    setupSettingsButton();
 };
 
-// 从 localStorage 加载数据
+// 加载数据
 function loadData() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        data = JSON.parse(saved);
-    }
+    if (saved) data = JSON.parse(saved);
 }
 
-// 保存数据到 localStorage（每次喝水都自动保存）
 function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-// 获取今天日期字符串（YYYY-MM-DD）
+function loadGoal() {
+    const savedGoal = localStorage.getItem("dailyGoal");
+    if (savedGoal) {
+        DAILY_GOAL = Number(savedGoal);
+        document.getElementById("goal").textContent = DAILY_GOAL;
+    }
+}
+
+// ==================== 核心功能 ====================
 function getToday() {
     return new Date().toISOString().slice(0,10);
 }
 
-// ==================== 核心功能 ====================
-// 添加指定毫升水
 function addWater(ml) {
     const today = getToday();
     if (!data.records[today]) data.records[today] = 0;
@@ -48,15 +50,78 @@ function addWater(ml) {
     updateStreak();
 }
 
-// 自定义加水
 function customAdd() {
-    let ml = prompt("请输入喝了多少毫升？", "300");
-    if (ml !== null && !isNaN(ml) && Number(ml) > 0) {
-        addWater(Number(ml));
+    const input = prompt("请输入喝水量（ml）", "300");
+    if (input && !isNaN(input) && Number(input) > 0) {
+        addWater(Number(input));
     }
 }
 
-// 更新界面所有数字和水位动画
+// 重置当天记录（长按3秒）
+function setupResetButton() {
+    const btn = document.getElementById("reset-btn");
+    let timer;
+    btn.onmousedown = btn.ontouchstart = () => {
+        timer = setTimeout(() => {
+            if (confirm("确定要重置今天的饮水记录吗？")) {
+                const today = getToday();
+                delete data.records[today];
+                saveData();
+                updateUI();
+                updateStreak();
+                alert("已重置当天记录！");
+            }
+        }, 2000);
+        btn.style.background = "#d32f2f";
+        btn.textContent = "松手取消...";
+    };
+    btn.onmouseup = btn.onmouseleave = btn.ontouchend = () => {
+        clearTimeout(timer);
+        btn.style.background = "#ff5252";
+        btn.textContent = "长按重置当天";
+    };
+}
+
+// 设置目标
+function setupSettingsButton() {
+    document.getElementById("settings-btn").onclick = () => {
+        document.getElementById("settings-modal").style.display = "flex";
+        document.getElementById("new-goal").value = DAILY_GOAL;
+    };
+}
+
+function saveGoal() {
+    const val = document.getElementById("new-goal").value;
+    if (val >= 1000 && val <= 5000) {
+        DAILY_GOAL = Number(val);
+        localStorage.setItem("dailyGoal", DAILY_GOAL);
+        document.getElementById("goal").textContent = DAILY_GOAL;
+        updateUI();
+        closeModal();
+    } else {
+        alert("目标范围：1000~5000ml");
+    }
+}
+
+function closeModal() {
+    document.getElementById("settings-modal").style.display = "none";
+}
+
+// 查看历史记录（简单版）
+function showHistory() {
+    let msg = "近7天记录：\n\n";
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const key = date.toISOString().slice(0,10);
+        const amount = data.records[key] || 0;
+        const day = date.toLocaleDateString("zh-CN", {month:"short", day:"numeric"});
+        msg += `${day}：${amount} ml ${amount >= MIN_FOR_STREAK ? "Success" : ""}\n`;
+    }
+    alert(msg);
+}
+
+// 更新界面
 function updateUI() {
     const today = getToday();
     const amount = data.records[today] || 0;
@@ -64,43 +129,31 @@ function updateUI() {
 
     document.getElementById("today").textContent = amount;
     document.getElementById("percent").textContent = percent;
-    document.getElementById("amount-text").textContent = amount + "ml";
-
-    // 水位动画
+    document.getElementById("amount-text").textContent = amount + " ml";
     document.getElementById("water").style.height = percent + "%";
 }
 
-// 计算连续打卡天数
 function updateStreak() {
     let streak = 0;
-    let checkDate = new Date();
-
+    let check = new Date();
     while (true) {
-        const key = checkDate.toISOString().slice(0,10);
+        const key = check.toISOString().slice(0,10);
         if (data.records[key] && data.records[key] >= MIN_FOR_STREAK) {
             streak++;
-            checkDate.setDate(checkDate.getDate() - 1); // 前一天
-        } else {
-            break;
-        }
+            check.setDate(check.getDate() - 1);
+        } else break;
     }
     document.getElementById("streak").textContent = `连续打卡 ${streak} 天`;
 }
 
-// ==================== 定时提醒 ====================
+// 定时提醒
 function startRemindTimer() {
     setInterval(() => {
-        // 只在页面可见且聚焦时提醒
-        if (document.hasFocus()) {
-            const now = Date.now();
-            // 简单防重复：10秒内不重复提醒
-            if (now - data.lastRemind > 10000) {
-                if (confirm("已经45分钟没记录喝水啦！现在喝一杯吗？")) {
-                    addWater(250); // 默认加一杯普通水
-                }
-                data.lastRemind = now;
-                saveData();
+        if (document.hasFocus() && Date.now() - data.lastRemind > 10000) {
+            if (confirm("已经45分钟没喝水啦，要记录一杯吗？")) {
+                addWater(250);
             }
+            data.lastRemind = Date.now();
         }
     }, REMIND_INTERVAL);
 }
