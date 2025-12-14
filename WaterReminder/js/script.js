@@ -2,7 +2,7 @@
 const STORAGE_KEY = "waterPro2025";
 let DAILY_GOAL = 2000;
 const MIN_FOR_STREAK = 1000;
-const REMIND_INTERVAL = 45 * 60 * 1000; // 45分钟提醒一次
+const REMIND_INTERVAL = 1 * 60 * 1000; // 45分钟提醒一次
 
 // 健康提醒内容库（可继续添加）
 const HEALTH_TIPS = [
@@ -118,22 +118,30 @@ function updateWeekAvg() {
     document.getElementById("week-avg").textContent = avg;
 }
 
-// ==================== 健康提醒功能（新增）================
+// ==================== 健康提醒功能 ====================
 function getRandomTip() {
     const tip = HEALTH_TIPS[Math.floor(Math.random() * HEALTH_TIPS.length)];
-    document.getElementById("tip-card").textContent = "Tip: " + tip;
+    document.getElementById("tip-card").textContent = "小贴士：" + tip;
 }
 
-// 45分钟定时提醒 + 健康小贴士
+// ==================== 定时提醒（已修复）===================
 function startRemindTimer() {
     setInterval(() => {
+        // 只在页面可见且聚焦时提醒，避免后台频繁弹窗
         if (document.hasFocus() && Date.now() - data.lastRemind > 10000) {
             const today = getToday();
-            if ((!data.records[today] || data.records[today] < DAILY_GOAL * 0.6)) {
-                if (confirm("已经45分钟没喝水啦！\n\n" + getRandomTip().replace("Tip: ", "") + "\n\n现在喝一杯吗？")) {
+            const todayAmount = data.records[today] || 0;
+
+            // 当今天喝水量少于目标的60%时才提醒
+            if (todayAmount < DAILY_GOAL * 0.6) {
+                // 现场随机生成一条健康贴士
+                const tip = HEALTH_TIPS[Math.floor(Math.random() * HEALTH_TIPS.length)];
+
+                if (confirm(`已经45分钟没喝水啦！\n\n小贴士：${tip}\n\n现在喝一杯吗？`)) {
                     addWater(250);
                 }
             }
+            // 更新上次提醒时间，防止短时间内重复弹窗
             data.lastRemind = Date.now();
             saveData();
         }
@@ -141,7 +149,7 @@ function startRemindTimer() {
 }
 
 // ==================== 其他功能 ====================
-// 长按重置当天
+// 长按重置当天 + 设置按钮
 function setupButtons() {
     const resetBtn = document.getElementById("reset-btn");
     let timer;
@@ -153,7 +161,7 @@ function setupButtons() {
                 updateAllDisplay();
                 alert("已重置当天记录");
             }
-        }, 2000);
+        }, 2000); // 长按2秒
         resetBtn.textContent = "松手取消...";
         resetBtn.style.background = "#d32f2f";
     };
@@ -193,7 +201,8 @@ function showHistory() {
         const key = d.toISOString().slice(0,10);
         const amt = data.records[key] || 0;
         const day = d.toLocaleDateString("zh-CN", {month:"numeric", day:"numeric"});
-        msg += `${day}（${["日","一","二","三","四","五","六"][d.getDay()]}） ${amt}ml ${amt >= MIN_FOR_STREAK ? "Success" : ""}\n`;
+        const weekday = ["日","一","二","三","四","五","六"][d.getDay()];
+        msg += `${day}（周${weekday}） ${amt}ml ${amt >= MIN_FOR_STREAK ? "✔" : ""}\n`;
     }
     alert(msg);
 }
